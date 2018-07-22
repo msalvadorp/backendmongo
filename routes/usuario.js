@@ -1,6 +1,10 @@
 var express = require('express')
 var bcrypt = require('bcrypt')
 
+//const jwt = require("jsonwebtoken")
+const autentica = require("../middleware/autenticacion")
+var SEED = require("../config/config").SEED
+
 const app = express()
 
 const Usuario = require("../models/usuario")
@@ -31,10 +35,13 @@ app.get("/", (req, res, next)=>{
     
 })
 
+
+
+
 // =========
 // Eliminar usuario por ID
 // =========
-app.delete("/:id", (req, res)=>{
+app.delete("/:id", autentica.verificaToken, (req, res)=>{
 
     const id = req.params.id
 
@@ -73,7 +80,7 @@ app.delete("/:id", (req, res)=>{
 // =========
 // Actualizar usuario
 // =========
-app.put("/:id", (req, res) =>{
+app.put("/:id", autentica.verificaToken,  (req, res) =>{
  
     const id = req.params.id
     const body = req.body
@@ -115,9 +122,10 @@ app.put("/:id", (req, res) =>{
                 })
              }
              usuarioGuardado.password = ":)"
-            res.status(200).json({
+                res.status(200).json({
                 ok : true,
-                usuario: usuarioGuardado
+                usuario: usuarioGuardado,
+                usuarioToken: req.usuario
     
             })
         })
@@ -132,7 +140,7 @@ app.put("/:id", (req, res) =>{
 // =========
 // Crear usuario
 // =========
-app.post("/", (req, res) =>{
+app.post("/", autentica.verificaToken, (req, res) =>{
     
     const body = req.body
 
@@ -158,7 +166,8 @@ app.post("/", (req, res) =>{
 
         res.status(201).json({
             ok : true,
-            usuario: usuarioGrabado
+            usuario: usuarioGrabado,
+            usuarioToken: req.usuario
     
         })
 

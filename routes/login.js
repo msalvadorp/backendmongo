@@ -1,12 +1,14 @@
 var express = require('express')
 var bcrypt = require('bcrypt')
+const jwt = require("jsonwebtoken")
 
+var SEED = require("../config/config").SEED
 const app = express()
 
 const Usuario = require("../models/usuario")
 //bcrypt.compareSync(myPlaintextPassword, hash)
 
-app.post("/", (req, res, next)=>{
+app.post("/", (req, res)=>{
 
     const body = req.body
 
@@ -36,8 +38,13 @@ app.post("/", (req, res, next)=>{
             })
         }
 
+        usuarioDB.password = ":)"
+        //token
+        const token = jwt.sign({usuario: usuarioDB}, SEED, {expiresIn: 14400})
+
         res.status(200).json({
             ok : true,
+            token: token,
             usuario: usuarioDB._id
     
         })
