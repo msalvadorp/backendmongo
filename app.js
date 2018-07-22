@@ -15,6 +15,7 @@ app.use(bodyParser.json())
 
 const appRoutes = require("./routes/app")
 const usuarioRoutes = require("./routes/usuario")
+const loginRoutes = require("./routes/login")
 
 //conexion a la base de dato
 mongoose.connection.openUri(
@@ -25,6 +26,7 @@ mongoose.connection.openUri(
 
 //definiendo rutas
 app.use("/usuario", usuarioRoutes)
+app.use("/login", loginRoutes)
 app.use("/", appRoutes)
 
 //escuchar peticiones
