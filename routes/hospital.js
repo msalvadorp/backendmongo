@@ -7,8 +7,15 @@ const Hospital = require("../models/hospital")
 
 app.get("/", (req, res)=> {
 
+    let desde = req.query.desde || 0
+    desde = Number(desde)
+
     Hospital.find({}, 
-        "nombre img usuario").exec((err, usuarios) => {
+        "nombre img")
+        .skip(desde)
+        .limit(5)
+        .populate("usuario", "nombre email")
+        .exec((err, hospitales) => {
             if (err) {
                 return res.status(500).json({
                     ok : false,
@@ -17,10 +24,16 @@ app.get("/", (req, res)=> {
                 })
             }
 
-            res.status(200).json({
-                ok : true,
-                usuarios
+            Hospital.count({}, (err, total) => {
+                res.status(200).json({
+                    ok : true,
+                    hospitales,
+                    total
+                })
+
             })
+
+            
             
         })
 })
@@ -48,7 +61,7 @@ app.post("/", autentica.verificaToken, (req, res) => {
 
         return res.status(201).json({
             ok : true,
-            hospital
+            hospital: usuarioGrabado
         })
 
     })
@@ -94,6 +107,37 @@ app.put("/:id", autentica.verificaToken, (req, res) => {
                 hospital: usuarioGrabado
             })
         
+        })
+
+    })
+
+})
+
+app.delete("/:id", autentica.verificaToken, (req, res) => {
+    const id = req.params.id
+
+
+    Hospital.findByIdAndRemove(id, (err, hospitalEliminar) => {
+        if(err){
+            return res.status(500).json({
+                ok : false,
+                mensaje : "Error al recuperar el usuario",
+                errors: error
+            })
+
+        }
+
+        if(!hospitalEliminar) {
+            return res.status(400).json({
+                ok : false,
+                mensaje : "No se encontro el hospital"
+            })
+        }
+
+        res.status(200).json({
+            ok : true,
+            usuario: hospitalEliminar
+
         })
 
     })

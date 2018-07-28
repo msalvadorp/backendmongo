@@ -11,8 +11,15 @@ const Usuario = require("../models/usuario")
 
 app.get("/", (req, res, next)=>{
 
+    
+    let desde = req.query.desde || 0
+    desde = Number(desde)
+
     Usuario.find({}, 
-        "nombre apellido email img role").exec(
+        "nombre apellido email img role")
+        .skip(desde)
+        .limit(5)
+        .exec(
             (error, usuarios)=>{
 
             if (error) {
@@ -23,11 +30,16 @@ app.get("/", (req, res, next)=>{
                 })
             }
 
-            res.status(200).json({
-                ok : true,
-                usuarios: usuarios
-        
+            Usuario.count({}, (err, conteo)=>{
+
+                res.status(200).json({
+                    ok : true,
+                    usuarios: usuarios,
+                    total: conteo
+                })
             })
+
+            
         
 
     })
@@ -140,10 +152,10 @@ app.put("/:id", autentica.verificaToken,  (req, res) =>{
 // =========
 // Crear usuario
 // =========
-app.post("/", autentica.verificaToken, (req, res) =>{
+app.post("/", (req, res) =>{
     
     const body = req.body
-
+    console.log("boy", body)
     var usuario = new Usuario({
         nombre: body.nombre,
         apellido: body.apellido,

@@ -17,6 +17,8 @@ const appRoutes = require("./routes/app")
 const usuarioRoutes = require("./routes/usuario")
 const loginRoutes = require("./routes/login")
 const hospitalRoutes = require("./routes/hospital")
+const medicosRoutes = require("./routes/medico")
+const busquedaRoutes = require("./routes/busqueda")
 
 //conexion a la base de dato
 mongoose.connection.openUri(
@@ -29,6 +31,8 @@ mongoose.connection.openUri(
 app.use("/usuario", usuarioRoutes)
 app.use("/login", loginRoutes)
 app.use("/hospital", hospitalRoutes)
+app.use("/medico", medicosRoutes)
+app.use("/busqueda", busquedaRoutes)
 app.use("/", appRoutes)
 
 //escuchar peticiones
