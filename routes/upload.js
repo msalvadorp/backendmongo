@@ -47,7 +47,7 @@ app.put('/:tipo/:id', function(req, res) {
 
     }
     //nombre archivo
-    let nombreArchivo = `${ id }-${ new Date().getMilliseconds() }.${ extension } `
+    let nombreArchivo = `${ id }-${ new Date().getMilliseconds() }.${ extension }`
     let ruta = `./uploads/${ tipo }/${ nombreArchivo}`
 
     archivo.mv(ruta, (err) =>{
@@ -62,9 +62,8 @@ app.put('/:tipo/:id', function(req, res) {
 
         return res.status(200).json({
             ok : true,
-            archivo: archivo.name,
-            extension: extension,
-            nombreArchivo
+            mensaje: "Archivo movido",
+            ruta
         })
     })
     
