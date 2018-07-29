@@ -20,6 +20,7 @@ const hospitalRoutes = require("./routes/hospital")
 const medicosRoutes = require("./routes/medico")
 const busquedaRoutes = require("./routes/busqueda")
 const uploadRoutes = require("./routes/upload")
+const imagenesRoutes = require("./routes/imagenes")
 
 //conexion a la base de dato
 mongoose.connection.openUri(
@@ -28,6 +29,12 @@ mongoose.connection.openUri(
     (err, res) => { if ( err ) throw err;
         console.log(`Database:`, 'online');})
 
+//configurando para mostrar la ruta de las imagenes
+//var serveIndex = require('serve-index')
+//app.use(express.static(__dirname + "/"))
+//app.use("/uploads", serveIndex(__dirname + "/uploads"))
+
+
 //definiendo rutas
 app.use("/usuario", usuarioRoutes)
 app.use("/login", loginRoutes)
@@ -35,6 +42,8 @@ app.use("/hospital", hospitalRoutes)
 app.use("/medico", medicosRoutes)
 app.use("/busqueda", busquedaRoutes)
 app.use("/upload", uploadRoutes)
+app.use("/img", imagenesRoutes)
+
 
 app.use("/", appRoutes)
 

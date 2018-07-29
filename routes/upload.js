@@ -1,12 +1,14 @@
 var express = require('express')
 const fileUpload = require('express-fileupload');
+const fs = require("fs")
+
+const Hospital = require("../models/hospital")
+const Medico = require("../models/medico")
+const Usuario = require("../models/usuario")
 
 const app = express()
 
 app.use(fileUpload());
-
- 
-
 
 app.put('/:tipo/:id', function(req, res) {
     if (!req.files){
@@ -60,13 +62,130 @@ app.put('/:tipo/:id', function(req, res) {
             })
         }
 
-        return res.status(200).json({
-            ok : true,
-            mensaje: "Archivo movido",
-            ruta
-        })
+        subirPotTipo(tipo, id, nombreArchivo, res)
+
+       
     })
     
   });
+
+  function eliminarArchivo(carpeta, img){
+    let pathViejo = `./uploads/${carpeta}/${img}`
+                
+    if (fs.existsSync(pathViejo)){
+         fs.unlink(pathViejo)
+     }
+  }
+
+function subirPotTipo(carpeta, id, nombreArchivo, res)
+{
+    if (carpeta === "usuarios") {
+
+        Usuario.findById(id)
+            .exec((err, usuarioBD)=>{
+                if(err){
+                    return res.status(500).json({
+                        ok : false,
+                        error: {message:  "Error al consultar el usuario"}
+                    })
+                }
+                eliminarArchivo(carpeta, usuarioBD.img)
+
+                usuarioBD.img = nombreArchivo
+
+                usuarioBD.save((err, usuarioActualizado) =>{
+                    if(err){
+                        return res.status(500).json({
+                            ok : false,
+                            mensaje : "No se pudo actualizar el usuario",
+                            error: err
+                        })
+                    }
+                    usuarioActualizado.password = ":)"
+                    return res.status(200).json({
+                        ok : true,
+                        usuario: usuarioActualizado
+                    })
+            
+                })
+
+        })
+    }
+
+    if (carpeta === "hospitales") {
+
+        Hospital.findById(id)
+            .exec((err, hospitalBD)=>{
+                if(err){
+                    return res.status(500).json({
+                        ok : false,
+                        error: {message:  "Error al consultar el hospital"}
+                    })
+                }
+                eliminarArchivo(carpeta, hospitalBD.img)
+
+                hospitalBD.img = nombreArchivo
+
+                hospitalBD.save((err, hospitalActualizado) =>{
+                    if(err){
+                        return res.status(500).json({
+                            ok : false,
+                            mensaje : "No se pudo actualizar el hospital",
+                            error: err
+                        })
+                    }
+                    
+                    return res.status(200).json({
+                        ok : true,
+                        hospital: hospitalActualizado
+                    })
+            
+                })
+
+        })
+    }
+
+    if (carpeta === "medicos") {
+
+        Medico.findById(id, (err, medicoBD)=>{
+                if(err){
+                    return res.status(500).json({
+                        ok : false,
+                        mensaje: "Error al consultar el medico",
+                        error: err
+                    })
+                }
+
+                if(!medicoBD)
+                {
+                    return res.status(400).json({
+                        ok : false,
+                        error: {message:  "Medico no existe"}
+                    })
+                }
+
+                eliminarArchivo(carpeta, medicoBD.img)
+
+                medicoBD.img = nombreArchivo
+
+                medicoBD.save((err, medicoActualizado) =>{
+                    if(err){
+                        return res.status(500).json({
+                            ok : false,
+                            mensaje : "No se pudo actualizar el medico",
+                            error: err
+                        })
+                    }
+                    
+                    return res.status(200).json({
+                        ok : true,
+                        medico: medicoActualizado
+                    })
+            
+                })
+
+        })
+    }
+}
 
 module.exports = app
